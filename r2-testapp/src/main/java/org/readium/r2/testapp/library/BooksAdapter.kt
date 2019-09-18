@@ -28,7 +28,6 @@ open class BooksAdapter(private val activity: Activity, private var books: Mutab
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = activity.layoutInflater
         val view = inflater.inflate(R.layout.item_recycle_opds, parent, false)
-
         return ViewHolder(view)
     }
 

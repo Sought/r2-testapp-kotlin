@@ -197,14 +197,14 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
                                         alertDialog.dismiss()
                                         showDocumentPicker()
                                     }
-                                }
+                                }.setTag(context.getString(R.string.tagButtonAddDeviceBook))
                                 button {
                                     text = context.getString(R.string.download_from_url)
                                     onClick {
                                         alertDialog.dismiss()
                                         showDownloadFromUrlAlert()
                                     }
-                                }
+                                }.setTag(context.getString(R.string.tagButtonAddURLBook))
                             }
                         }
                     }.show()
@@ -212,7 +212,7 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
             }.lparams {
                 gravity = Gravity.END or Gravity.BOTTOM
                 margin = dip(16)
-            }
+            }.setTag(context.getString(R.string.tagButtonAddBook))
         }
 
     }
@@ -259,6 +259,7 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
                         editTextHref = editText {
                             hint = "URL"
                             contentDescription = "Enter A URL"
+                            tag = "inputAddURLBook"
                         }
                     }
                 }

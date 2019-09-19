@@ -12,6 +12,7 @@ import org.jetbrains.anko.db.*
 import org.readium.r2.testapp.db.BOOKSTable
 import org.readium.r2.testapp.db.BooksDatabase
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.uiautomator.UiScrollable
 
 
 /**
@@ -39,6 +40,7 @@ fun initTestEnv() {
     val perm = UiDevice.getInstance(getInstrumentation()).findObject(UiSelector().text("Allow"))
     if (perm.exists())
         perm.click()
+    //TODO: Invalidate view (postInvalidate?) to redraw everything and not have some tests fail.
 }
 
 /**
@@ -48,6 +50,17 @@ fun initTestEnv() {
  */
 fun clickButtonUiAutomator(button: String) {
     UiDevice.getInstance(getInstrumentation()).findObject(UiSelector().text(button)).click()
+}
+
+/**
+ * Uses UiAutomator to scroll a scrollable view until the text searched appears.
+ * clickButtonUiAutomator is then called with the text to click on.
+ *
+ * test:String - The text the function should scroll to and click.
+ */
+fun scrollUntilFoundTextAndClickUiAutomator(text: String) {
+    UiScrollable(UiSelector().scrollable(true)).scrollIntoView(UiSelector().text(text))
+    clickButtonUiAutomator(text)
 }
 
 /**

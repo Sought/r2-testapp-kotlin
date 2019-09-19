@@ -22,4 +22,16 @@
 
     <string name="OPDS2TestRemoteURL" translatable="false">https://dita.digital/publication.json</string>
     <string name="OPDS2TestRemoteName" translatable="false">Understanding media and culture: an introduction to mass communication</string>
+
+    <string name="Folder1" translatable="false">Android</string>
+    <string name="Folder2" translatable="false">data</string>
+    <string name="Folder3" translatable="false">org.readium.r2reader.test</string>
+    <string name="Folder4" translatable="false">files</string>
+    <string name="UnsupportedVersionTest" translatable="false">The Android version is not compatible with this test</string>
+    <string name="epubTestFile" translatable="false">___loiseau_nevrosee.epub</string>
+    <string name="audiobookTestFile" translatable="false">//FIXME fill with audio book file</string>
+    <string name="webtoonManifestDiViNaTestFile" translatable="false">___webtoon_manifest.divina</string>
+    <string name="webtoonPublicationDiViNaTestFile" translatable="false">___webtoon_publication.divina</string>
+    <string name="turbomediaManifestDiViNaTestFile" translatable="false">___turbomedia_manifest.divina</string>
+    <string name="turbomediaPublicationDiViNaTestFile" translatable="false">___turbomedia_publication.divina</string>
 </resources>

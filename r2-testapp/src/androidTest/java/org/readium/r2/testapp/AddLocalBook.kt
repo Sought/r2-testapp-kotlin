@@ -23,9 +23,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.readium.r2.testapp.setup.clickButtonUiAutomator
-import org.readium.r2.testapp.setup.getStr
-import org.readium.r2.testapp.setup.initTestEnv
+import org.readium.r2.testapp.setup.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -43,7 +41,8 @@ class AddLocalBook
     @Before
     @After
     fun cleanPubs() {
-         initTestEnv()
+        initTestEnv()
+        remPubsFromDeviceInternalMemory()
     }
 
     /**
@@ -86,14 +85,18 @@ class AddLocalBook
     /**
      * Once the device's file explorer is open, navigate into the test files' folder.
      */
-    private fun goToTestFiles() {
+    private fun selectFile(pub: String) {
         // TODO: add a variant for each test device used, as the UI changes on different versions.
 
         when (Build.VERSION.SDK_INT){
             23 -> {
                 //ANDROID 6 TABLET
                 clickButtonUiAutomator(getStr(R.string.InternalStorage_SDK23))
-                clickButtonUiAutomator(getStr(R.string.FilesFolderName))
+                scrollUntilFoundTextAndClickUiAutomator(getStr(R.string.Folder1))
+                clickButtonUiAutomator(getStr(R.string.Folder2))
+                scrollUntilFoundTextAndClickUiAutomator(getStr(R.string.Folder3))
+                clickButtonUiAutomator(getStr(R.string.Folder4))
+                clickButtonUiAutomator(pub)
             }
             else -> throw Exception(getStr(R.string.UnsupportedVersionTest))
         }
@@ -101,21 +104,73 @@ class AddLocalBook
     }
 
     /**
-     * Tests that importing a CBZ works. Resets the imported database, imports the cbz publication
-     * then checks that a coverImageView exists. It currently does not check if the cover is the
-     * right one. It might confuse the test if multiple imageViews are present (and make it fail
-     * even if the CBZ file was added).
+     * Tests that importing a publication works. Resets the imported database, imports the
+     * publication then checks that a coverImageView exists. It currently does not check if the
+     * cover is the right one. It might confuse the test if multiple imageViews are present (and
+     * make it fail even if the file was added).
      */
-    @Test
-    fun importLocalCBZPublicationWorks() {
-        //copyPubsFromAPKToDeviceInternalMemory("___example.cbz")
+    fun importTestPublicationWorks(pub: String) {
+        copyPubFromAPKToDeviceInternalMemory(pub)
         onView(withTagValue(CoreMatchers.`is`(getStr(R.string.tagButtonAddBook)))).perform(ViewActions.click())
         onView(withTagValue(CoreMatchers.`is`(getStr(R.string.tagButtonAddDeviceBook)))).perform(ViewActions.click())
-
-        goToTestFiles()
-        clickButtonUiAutomator(getStr(R.string.cbzTestFolder))
-        clickButtonUiAutomator(getStr(R.string.cbzTestFile))
-
+        selectFile(pub)
+        waitFor(5000)
         onView(withId(R.id.coverImageView)).check(matches(withId(R.id.coverImageView)))
+    }
+
+    /**
+     * Tests if a Local CBZ that is valid can be added.
+     */
+    @Test
+    fun importLocalCBZPWorks() {
+        importTestPublicationWorks(getStr(R.string.cbzTestFile))
+    }
+
+    /**
+     * Tests if a Local EPub that is valid can be added.
+     */
+    @Test
+    fun importLocalEPubWorks() {
+        importTestPublicationWorks(getStr(R.string.epubTestFile))
+    }
+
+    /**
+     * Tests if a Local Audiobook that is valid can be added.
+     */
+    @Test
+    fun importLocalAudioBookWorks() {
+        importTestPublicationWorks(getStr(R.string.audiobookTestFile))
+    }
+
+    /**
+     * Tests if a Local DiViNa webtoon with manifest that is valid can be added.
+     */
+    @Test
+    fun importLocalDivinaManifestWebtoonWorks() {
+        importTestPublicationWorks(getStr(R.string.webtoonManifestDiViNaTestFile))
+    }
+
+    /**
+     * Tests if a Local DiViNa webtoon with publication that is valid can be added.
+     */
+    @Test
+    fun importLocalDivinaPublicationWebtoonWorks() {
+        importTestPublicationWorks(getStr(R.string.webtoonPublicationDiViNaTestFile))
+    }
+
+    /**
+     * Tests if a Local DiViNa turbomedia with manifest that is valid can be added.
+     */
+    @Test
+    fun importLocalDivinaManifestTurbomediaWorks() {
+        importTestPublicationWorks(getStr(R.string.turbomediaManifestDiViNaTestFile))
+    }
+
+    /**
+     * Tests if a Local DiViNa turbomedia with publication that is valid can be added.
+     */
+    @Test
+    fun importLocalDivinaPublicationTurbomediaWorks() {
+        importTestPublicationWorks(getStr(R.string.turbomediaPublicationDiViNaTestFile))
     }
 }

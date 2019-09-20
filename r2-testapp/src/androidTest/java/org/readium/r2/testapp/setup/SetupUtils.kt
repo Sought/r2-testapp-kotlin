@@ -6,6 +6,7 @@
 
 package org.readium.r2.testapp.setup
 
+import android.util.Log
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import org.jetbrains.anko.db.*
@@ -13,6 +14,9 @@ import org.readium.r2.testapp.db.BOOKSTable
 import org.readium.r2.testapp.db.BooksDatabase
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiScrollable
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 
 /**
@@ -41,6 +45,43 @@ fun initTestEnv() {
     if (perm.exists())
         perm.click()
     //TODO: Invalidate view (postInvalidate?) to redraw everything and not have some tests fail.
+}
+
+/**
+ * Writes the file in the androidTest app assets folder to the device's internal storage.
+ * @ /Android/data/org.readium.r2reader.test
+ * Logs error if it happens.
+ *
+ * pub: String - The name of the publication to add to internal memory.
+ */
+fun copyPubFromAPKToDeviceInternalMemory(pub: String) {
+    try {
+        Log.w("PATH", getInstrumentation().context.getExternalFilesDir(null)!!.absolutePath)
+        val file = File(getInstrumentation().context.getExternalFilesDir(null), pub)
+        val ins = getInstrumentation().context.assets.open(pub)
+        val outs = FileOutputStream(file)
+        var data = ByteArray(ins.available())
+        ins.read(data)
+        outs.write(data)
+        ins.close()
+        outs.close()
+    } catch (e: IOException) {
+        Log.e("IO ERROR", e.stackTrace.toString())
+    }
+}
+
+/**
+ * Removes every single file in the device's internal storage
+ * @ /Android/data/org.readium.r2reader.test
+ */
+fun remPubsFromDeviceInternalMemory() {
+    try {
+        getInstrumentation().context.getExternalFilesDir(null)!!.walk().forEach {
+            it.delete()
+        }
+    } catch (e: IOException) {
+        Log.e("IO ERROR", e.stackTrace.toString())
+    }
 }
 
 /**

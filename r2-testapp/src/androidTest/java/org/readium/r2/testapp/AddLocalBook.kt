@@ -86,7 +86,8 @@ class AddLocalBook
      * Once the device's file explorer is open, navigate into the test files' folder.
      */
     private fun selectFile(pub: String) {
-        // TODO: add a variant for each test device used, as the UI changes on different versions.
+        //TODO: add a variant for each test device used, as the UI changes on different versions.
+        //    It might need another switch rather than the build sdk version.
 
         when (Build.VERSION.SDK_INT){
             23 -> {

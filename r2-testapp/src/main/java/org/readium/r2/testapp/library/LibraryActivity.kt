@@ -697,44 +697,35 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
                     }
                     else -> input.toFile(publicationPath)
                 }
-
-                val file = File(publicationPath)
-
-                when {
-                    element.endsWith(Publication.EXTENSION.EPUB.value) -> {
-                        val parser = EpubParser()
-                        val pub = parser.parse(publicationPath)
-                        if (pub != null) {
-                            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
-                                    ?: false)
-                        }
-                    }
-                    element.endsWith(Publication.EXTENSION.CBZ.value) -> {
-                        val parser = CbzParser()
-                        val pub = parser.parse(publicationPath)
-                        if (pub != null) {
-                            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
-                                    ?: false)
-                        }
-                    }
-                    element.endsWith(Publication.EXTENSION.AUDIO.value) -> {
-                        val parser = AudioBookParser()
-                        val pub = parser.parse(publicationPath)
-                        if (pub != null) {
-                            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
-                                    ?: false)
-                        }
-                    }
-                    element.endsWith(Publication.EXTENSION.DIVINA.value) -> {
-                        val parser = DiViNaParser()
-                        val pub = parser.parse(publicationPath)
-                        if (pub != null) {
-                            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
-                                    ?: false)
-                        }
-                    }
-                }
+                addBook(element, fileName)
             }
+        }
+    }
+
+    /**
+     * prepares element to be served.
+     *
+     * element: String - The file name
+     * fileName: String - A random UUID
+     */
+    private fun addBook(element: String, fileName: String) {
+        val publicationPath = R2DIRECTORY + fileName
+        val file = File(publicationPath)
+        lateinit var parser: PublicationParser
+        val pub: PubBox?
+
+        when {
+            element.endsWith(Publication.EXTENSION.EPUB.value) -> { parser = EpubParser() }
+            element.endsWith(Publication.EXTENSION.CBZ.value) -> { parser = CbzParser() }
+            element.endsWith(Publication.EXTENSION.AUDIO.value) -> { parser = AudioBookParser() }
+            element.endsWith(Publication.EXTENSION.DIVINA.value) -> { parser = DiViNaParser() }
+            else -> return
+        }
+
+        pub = parser.parse(publicationPath)
+        if (pub != null) {
+            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
+                    ?: false)
         }
     }
 

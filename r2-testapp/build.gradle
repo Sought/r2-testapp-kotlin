@@ -79,6 +79,11 @@ android {
                 java.srcDirs = ['src/main/java', 'src/nondrm/java']
             }
         }
+
+        debug {
+            res.srcDirs = ['src/androidTest/res', 'src/main/res']
+            assets.srcDirs = ['src/androidTest/assets']
+        }
     }
 }
 

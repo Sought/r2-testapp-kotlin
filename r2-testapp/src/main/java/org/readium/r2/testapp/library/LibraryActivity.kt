@@ -711,7 +711,7 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
     private fun addBook(element: String, fileName: String) {
         val publicationPath = R2DIRECTORY + fileName
         val file = File(publicationPath)
-        lateinit var parser: PublicationParser
+        val parser: PublicationParser
         val pub: PubBox?
 
         when {

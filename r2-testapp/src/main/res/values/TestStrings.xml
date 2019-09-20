@@ -29,7 +29,7 @@
     <string name="Folder4" translatable="false">files</string>
     <string name="UnsupportedVersionTest" translatable="false">The Android version is not compatible with this test</string>
     <string name="epubTestFile" translatable="false">___loiseau_nevrosee.epub</string>
-    <string name="audiobookTestFile" translatable="false">//FIXME fill with audio book file</string>
+    <string name="audiobookTestFile" translatable="false">___art_letters_sample.audiobook</string>
     <string name="webtoonManifestDiViNaTestFile" translatable="false">___webtoon_manifest.divina</string>
     <string name="webtoonPublicationDiViNaTestFile" translatable="false">___webtoon_publication.divina</string>
     <string name="turbomediaManifestDiViNaTestFile" translatable="false">___turbomedia_manifest.divina</string>

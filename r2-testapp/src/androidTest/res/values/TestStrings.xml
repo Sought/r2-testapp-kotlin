@@ -31,4 +31,14 @@
     <string name="webtoonPublicationDiViNaTestFile" translatable="false">___webtoon_publication.divina</string>
     <string name="turbomediaManifestDiViNaTestFile" translatable="false">___turbomedia_manifest.divina</string>
     <string name="turbomediaPublicationDiViNaTestFile" translatable="false">___turbomedia_publication.divina</string>
+
+    <string name="invalidCBZFile" translatable="false">___invalid_pub.cbz</string>
+    <string name="invalidEPubFile" translatable="false">___invalid_pub.epub</string>
+    <string name="invalidDiViNaFile" translatable="false">___invalid_pub.divina</string>
+    <string name="invalidAudioBookFile" translatable="false">___invalid_pub.audiobook</string>
+
+    <string name="invalidEmptyCBZFile" translatable="false">___invalid_empty_pub.cbz</string>
+    <string name="invalidEmptyEPubFile" translatable="false">___invalid_empty_pub.epub</string>
+    <string name="invalidEmptyDiViNaFile" translatable="false">___invalid_empty_pub.divina</string>
+    <string name="invalidEmptyAudioBookFile" translatable="false">___invalid_empty_pub.audiobook</string>
 </resources>

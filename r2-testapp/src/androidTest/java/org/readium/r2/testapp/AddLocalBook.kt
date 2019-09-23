@@ -9,7 +9,9 @@ package org.readium.r2.testapp
 import android.os.Build
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withTagValue
 import androidx.test.filters.LargeTest
@@ -63,18 +65,30 @@ class AddLocalBook
     }
 
     /**
-     * Tests that importing a publication works. Resets the imported database, imports the
-     * publication then checks that a coverImageView exists. It currently does not check if the
-     * cover is the right one. It might confuse the test if multiple imageViews are present (and
-     * make it fail even if the file was added).
+     * Resets the imported database, imports the publication then waits some time
      */
-    fun importTestPublicationWorks(pub: String) {
+    fun importTestPublication(pub: String) {
         copyPubFromAPKToDeviceInternalMemory(pub)
         onView(withTagValue(CoreMatchers.`is`(getStr(R.string.tagButtonAddBook)))).perform(ViewActions.click())
         onView(withTagValue(CoreMatchers.`is`(getStr(R.string.tagButtonAddDeviceBook)))).perform(ViewActions.click())
         selectFileInExplorer(pub)
-        waitFor(5000)
+        waitFor(1000)
+    }
+
+    /**
+     * Tests that a valid publication could be imported by checking that there is a cover image view
+     */
+    fun importTestPublicationWorks(pub: String) {
+        importTestPublication(pub)
         onView(withId(R.id.coverImageView)).check(matches(withId(R.id.coverImageView)))
+    }
+
+    /**
+     * Tests that an invalid publication could not be imported by checking that
+     */
+    fun importTestPublicationFail(pub: String) {
+        importTestPublication(pub)
+        onView(withId(R.id.coverImageView)).check(doesNotExist())
     }
 
     /**
@@ -132,4 +146,74 @@ class AddLocalBook
     fun importLocalDivinaPublicationTurbomediaWorks() {
         importTestPublicationWorks(getStr(R.string.turbomediaPublicationDiViNaTestFile))
     }
+
+    /**
+     * Running these tests will keep the app running. Once the issue that make them keep the app busy
+     * is taken care of, they should be un-commented then.
+     */
+    /*
+    /**
+     * Tests if a local Invalid CBZ fails as it should
+     */
+    @Test
+    fun importLocalCBZPublicationFail() {
+        importTestPublicationFail(getStr(R.string.invalidCBZFile))
+    }
+
+    /**
+     * Tests if a local Invalid Epub (empty zipped) fails as it should
+     */
+    @Test
+    fun importLocalEpubPublicationFail() {
+        importTestPublicationFail(getStr(R.string.invalidEPubFile))
+    }
+
+    /**
+     * Tests if a local Invalid Audiobook (empty zipped) fails as it should
+     */
+    @Test
+    fun importLocalAudiobookPublicationFail() {
+        importTestPublicationFail(getStr(R.string.invalidAudioBookFile))
+    }
+
+    /**
+     * Tests if a local Invalid DiViNa (empty zipped) fails as it should
+     */
+    @Test
+    fun importLocalDivinaPublicationFail() {
+        importTestPublicationFail(getStr(R.string.invalidDiViNaFile))
+    }
+
+    /**
+     * Tests if a local Invalid empty CBZ fails as it should
+     */
+    @Test
+    fun importLocalEmptyCBZPublicationFail() {
+        importTestPublicationFail(getStr(R.string.invalidEmptyCBZFile))
+    }
+
+    /**
+     * Tests if a local Invalid empty Epub fails as it should
+     */
+    @Test
+    fun importLocalEmptyEpubPublicationFail() {
+        importTestPublicationFail(getStr(R.string.invalidEmptyEPubFile))
+    }
+
+    /**
+     * Tests if a local Invalid empty Audiobook fails as it should
+     */
+    @Test
+    fun importLocalEmptyAudiobookPublicationFail() {
+        importTestPublicationFail(getStr(R.string.invalidEmptyAudioBookFile))
+    }
+
+    /**
+     * Tests if a local Invalid empty DiViNa fails as it should
+     */
+    @Test
+    fun importLocalEmptyDivinaPublicationFail() {
+        importTestPublicationFail(getStr(R.string.invalidEmptyDiViNaFile))
+    }
+    */
 }

@@ -5,12 +5,8 @@
     <string name="tagButtonAddURLBook" translatable="false">buttonAddURLBook</string>
     <string name="tagInputAddURLBook" translatable="false">inputAddURLBook</string>
 
-
     <string name="InternalStorage_SDK23" translatable="false">Internal storage</string>
     <string name="FilesFolderName" translatable="false">___tests-r2-testapp</string>
-
-    <string name="cbzTestFolder" translatable="false">___cbz</string>
-    <string name="cbzTestFile" translatable="false">___example.cbz</string>
 
     <string name="UnsupportedVerisonTest" translatable="false">Unsupported Android version for this test</string>
 
@@ -29,6 +25,7 @@
     <string name="Folder4" translatable="false">files</string>
     <string name="UnsupportedVersionTest" translatable="false">The Android version is not compatible with this test</string>
     <string name="epubTestFile" translatable="false">___loiseau_nevrosee.epub</string>
+    <string name="cbzTestFile" translatable="false">___edrlab_test.cbz</string>
     <string name="audiobookTestFile" translatable="false">___art_letters_sample.audiobook</string>
     <string name="webtoonManifestDiViNaTestFile" translatable="false">___webtoon_manifest.divina</string>
     <string name="webtoonPublicationDiViNaTestFile" translatable="false">___webtoon_publication.divina</string>

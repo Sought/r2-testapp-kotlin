@@ -72,7 +72,7 @@ class AddRemoteBook
     @Test
     fun importRemoteAudioBookPublicationWorks() {
         importPublicationWorks(getStr(R.string.audiobookTestRemoteURL),
-                getStr(R.string.audiobookTestRemoteName), 5000)
+                getStr(R.string.audiobookTestName), 5000)
     }
 
     /**

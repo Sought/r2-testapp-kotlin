@@ -11,7 +11,7 @@
     <string name="UnsupportedVerisonTest" translatable="false">Unsupported Android version for this test</string>
 
     <string name="audiobookTestRemoteURL" translatable="false">https://api.archivelab.org/books/art_letters_1809_librivox/opds_audio_manifest</string>
-    <string name="audiobookTestRemoteName" translatable="false">The Art of Letters</string>
+    <string name="audiobookTestName" translatable="false">The Art of Letters</string>
 
     <string name="webPublicationTestRemoteURL" translatable="false">https://d2e.dita.digital/pub/L3Jvb3QvZDJlLXN0cmVhbWVyL21pc2MvZXB1YnMvY2hpbGRyZW5zLWxpdGVyYXR1cmUuZXB1Yg==/manifest.json</string>
     <string name="webPublicationTestRemoteName" translatable="false">Children\'s Literature</string>

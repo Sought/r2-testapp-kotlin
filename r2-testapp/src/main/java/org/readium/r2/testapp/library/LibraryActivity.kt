@@ -644,8 +644,6 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
                 server.loadCustomResource(assets.open("Search/mark.js"), "mark.js", Injectable.Script)
                 server.loadCustomResource(assets.open("Search/search.js"), "search.js", Injectable.Script)
                 server.loadCustomResource(assets.open("Search/mark.css"), "mark.css", Injectable.Style)
-
-
             }
         }
     }
@@ -664,6 +662,9 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
         }
     }
 
+    /**
+     * Calls addBook for each file in internal storage that can be read.
+     */
     private fun copySamplesFromAssetsToStorage() {
         assets.list("Samples")?.filter {
             it.endsWith(Publication.EXTENSION.EPUB.value)
@@ -676,28 +677,7 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
                 val fileName = UUID.randomUUID().toString()
                 val publicationPath = R2DIRECTORY + fileName
 
-                when {
-                    element.endsWith(Publication.EXTENSION.DIVINA.value) -> {
-                        val output = File(publicationPath);
-                        if (!output.exists()) {
-                            if (!output.mkdir()) {
-                                throw RuntimeException("Cannot create directory");
-                            }
-                        }
-                        ZipUtil.unpack(input, output)
-                    }
-                    element.endsWith(Publication.EXTENSION.AUDIO.value) -> {
-                        val output = File(publicationPath)
-                        if (!output.exists()) {
-                            if (!output.mkdir()) {
-                                throw RuntimeException("Cannot create directory")
-                            }
-                        }
-                        ZipUtil.unpack(input, output)
-                    }
-                    else -> input.toFile(publicationPath)
-                }
-                addBook(element, fileName)
+                addBook(element, fileName, publicationPath, input)
             }
         }
     }
@@ -705,28 +685,65 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
     /**
      * prepares element to be served.
      *
-     * element: String - The file name
+     * element: String - The original file name, with extension
      * fileName: String - A random UUID
+     * outputFilePath: String - The output file that will be added to the db
+     * input: InputStream: The original file in the assets
      */
-    private fun addBook(element: String, fileName: String) {
-        val publicationPath = R2DIRECTORY + fileName
-        val file = File(publicationPath)
-        val parser: PublicationParser
-        val pub: PubBox?
+    private fun addBook(element: String, fileName: String, outputFilePath: String, input: InputStream) {
 
-        when {
-            element.endsWith(Publication.EXTENSION.EPUB.value) -> { parser = EpubParser() }
-            element.endsWith(Publication.EXTENSION.CBZ.value) -> { parser = CbzParser() }
-            element.endsWith(Publication.EXTENSION.AUDIO.value) -> { parser = AudioBookParser() }
-            element.endsWith(Publication.EXTENSION.DIVINA.value) -> { parser = DiViNaParser() }
-            else -> return
+        // if the element is a DiViNa or an Audiobook file, unzip in output. Copy element in output
+        // otherwise
+        if (element.endsWith(Publication.EXTENSION.DIVINA.value)
+                    || element.endsWith(Publication.EXTENSION.AUDIO.value)) {
+            val output = File(outputFilePath)
+            unzip(input, output)
         }
+        else
+            input.toFile(outputFilePath)
 
-        pub = parser.parse(publicationPath)
+        //open copied file or folder
+        val file = File(outputFilePath)
+
+        //gets the correct parser, return if null.
+        val parser = getParser(element)?:return
+
+        val pub: PubBox?
+        pub = parser.parse(outputFilePath)
         if (pub != null) {
             prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
                     ?: false)
         }
+    }
+
+    /**
+     * Returns the correct parser for the given 'original' file name
+     *
+     * element: String - The file to parse
+     */
+    private fun getParser(element: String): PublicationParser? {
+        when {
+            element.endsWith(Publication.EXTENSION.EPUB.value) -> return EpubParser()
+            element.endsWith(Publication.EXTENSION.CBZ.value) -> return CbzParser()
+            element.endsWith(Publication.EXTENSION.AUDIO.value) -> return AudioBookParser()
+            element.endsWith(Publication.EXTENSION.DIVINA.value) -> return DiViNaParser()
+        }
+        return null
+    }
+
+    /**
+     * Unzips a file pointed by input in a folder pointed by output.
+     *
+     * input: InputStream - The file to unzip
+     * output: File - The folder in which input should be unzipped
+     */
+    private fun unzip(input: InputStream, output: File) {
+        if (!output.exists()) {
+            if (!output.mkdir()) {
+                throw RuntimeException("Cannot create directory");
+            }
+        }
+        ZipUtil.unpack(input, output)
     }
 
     private fun copyFile(src: File, dst: File) {

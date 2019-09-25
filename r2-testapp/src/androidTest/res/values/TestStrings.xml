@@ -41,4 +41,9 @@
     <string name="invalidEmptyEPubFile" translatable="false">___invalid_empty_pub.epub</string>
     <string name="invalidEmptyDiViNaFile" translatable="false">___invalid_empty_pub.divina</string>
     <string name="invalidEmptyAudioBookFile" translatable="false">___invalid_empty_pub.audiobook</string>
+
+    <string name="playButton" translatable="false">PlayButton</string>
+    <string name="pauseButton" translatable="false">PauseButton</string>
+
+
 </resources>

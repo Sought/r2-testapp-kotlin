@@ -14,9 +14,9 @@ import org.readium.r2.testapp.db.BOOKSTable
 import org.readium.r2.testapp.db.BooksDatabase
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiScrollable
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
+import org.readium.r2.testapp.library.LibraryActivity
+import java.io.*
+import java.util.*
 
 
 /**
@@ -122,4 +122,24 @@ fun waitFor(time: Long) {
  */
 fun getStr(strID: Int) : String {
     return getInstrumentation().targetContext.getString(strID)
+}
+
+/**
+ * Adds pub to the database
+ *
+ * pub: String - The name of the publication to add to the database
+ * activity: LibraryActivity? - Instance of LibraryActivity.
+ */
+fun addPubToDatabase(pub: String, activity: LibraryActivity?) {
+    val method = LibraryActivity::class.java.getDeclaredMethod("addBook", String::class.java,
+            String::class.java, String::class.java, InputStream::class.java)
+    method.isAccessible = true
+
+    val attr = LibraryActivity::class.java.getDeclaredField("R2DIRECTORY")
+    attr.isAccessible = true
+
+    val uuid = UUID.randomUUID().toString()
+    val outputFilePath = (attr.get(activity) as String) + "/" + uuid
+    val input = getInstrumentation().context.assets.open(pub)
+    method.invoke(activity, pub, uuid, outputFilePath, input)
 }

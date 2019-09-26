@@ -19,10 +19,10 @@ import java.util.*
 
 
 /**
- * Initializes the testing environment by destroying the Books table and creating it again.
- * Would be preferable to have a function to create it in the BooksDatabase.kt file.
- * It also allows permission to access the sdcard.
- * This function allows the tests to run without having to manually configure the app.
+ * Initializes the testing environment by destroying the Books, bookmarks and positions tables, and
+ * creating them again. Would be preferable to have a function to create it in the BooksDatabase.kt
+ * file. It also allows permission to access the sdcard. This function allows the tests to run
+ * without having to manually configure the app.
  */
 fun initTestEnv() {
     val db = BooksDatabase(getInstrumentation().targetContext)

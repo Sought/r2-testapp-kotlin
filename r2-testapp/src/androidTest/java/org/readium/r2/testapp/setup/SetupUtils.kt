@@ -10,10 +10,9 @@ import android.util.Log
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
 import org.jetbrains.anko.db.*
-import org.readium.r2.testapp.db.BOOKSTable
-import org.readium.r2.testapp.db.BooksDatabase
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiScrollable
+import org.readium.r2.testapp.db.*
 import org.readium.r2.testapp.library.LibraryActivity
 import java.io.*
 import java.util.*
@@ -41,6 +40,32 @@ fun initTestEnv() {
                 BOOKSTable.EXTENSION to TEXT,
                 BOOKSTable.CREATION to INTEGER)
     }
+
+    val bmdb = BookmarksDatabase(getInstrumentation().targetContext)
+    bmdb.bookmarks.dropTable()
+    bmdb.shared.use {
+        createTable(BOOKMARKSTable.NAME, true,
+                BOOKMARKSTable.ID to INTEGER + PRIMARY_KEY + AUTOINCREMENT,
+                BOOKMARKSTable.BOOK_ID to INTEGER,
+                BOOKMARKSTable.PUBLICATION_ID to TEXT,
+                BOOKMARKSTable.RESOURCE_INDEX to INTEGER,
+                BOOKMARKSTable.RESOURCE_HREF to TEXT,
+                BOOKMARKSTable.RESOURCE_TYPE to TEXT,
+                BOOKMARKSTable.RESOURCE_TITLE to TEXT,
+                BOOKMARKSTable.LOCATION to TEXT,
+                BOOKMARKSTable.LOCATOR_TEXT to TEXT,
+                BOOKMARKSTable.CREATION_DATE to INTEGER)
+    }
+
+    val pdb = PositionsDatabase(getInstrumentation().targetContext)
+    pdb.positions.dropTable()
+    pdb.shared.use {
+        createTable(POSITIONSTable.NAME, true,
+                POSITIONSTable.ID to INTEGER + PRIMARY_KEY + AUTOINCREMENT,
+                POSITIONSTable.BOOK_ID to INTEGER,
+                POSITIONSTable.SYNTHETIC_PAGE_LIST to TEXT)
+    }
+
     val perm = UiDevice.getInstance(getInstrumentation()).findObject(UiSelector().text("Allow"))
     if (perm.exists())
         perm.click()
@@ -77,6 +102,9 @@ fun copyPubFromAPKToDeviceInternalMemory(pub: String) {
 fun remPubsFromDeviceInternalMemory() {
     try {
         getInstrumentation().context.getExternalFilesDir(null)!!.walk().forEach {
+            it.delete()
+        }
+        getInstrumentation().targetContext.getExternalFilesDir(null)!!.walk().forEach {
             it.delete()
         }
     } catch (e: IOException) {

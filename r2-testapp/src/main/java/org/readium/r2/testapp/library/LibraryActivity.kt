@@ -23,6 +23,7 @@ import android.graphics.Rect
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
@@ -1052,7 +1053,7 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
                     }
                     ZipUtil.unpack(input, output)
                 }
-                name.endsWith(Publication.EXTENSION.AUDIO.value) -> {
+                name.endsWith(Publication.EXTENSION.AUDIO.value) && Build.VERSION.SDK_INT < 23 -> {
                     val output = File(publicationPath)
                     if (!output.exists()) {
                         if (!output.mkdir()) {

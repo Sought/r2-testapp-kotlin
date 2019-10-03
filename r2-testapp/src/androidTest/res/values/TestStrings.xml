@@ -25,6 +25,7 @@
     <string name="Folder4" translatable="false">files</string>
     <string name="UnsupportedVersionTest" translatable="false">The Android version is not compatible with this test</string>
     <string name="epubTestFile" translatable="false">___loiseau_nevrosee.epub</string>
+    <string name="epubTestName" translatable="false">Névrosée</string>
     <string name="cbzTestFile" translatable="false">___edrlab_test.cbz</string>
     <string name="audiobookTestFile" translatable="false">___art_letters_sample.audiobook</string>
     <string name="webtoonManifestDiViNaTestFile" translatable="false">___webtoon_manifest.divina</string>

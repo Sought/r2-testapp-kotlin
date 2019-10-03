@@ -11,19 +11,24 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withTagValue
-import androidx.test.filters.LargeTest
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import org.hamcrest.CoreMatchers
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.readium.r2.testapp.setup.*
+import org.readium.r2.testapp.setup.clickButtonUiAutomator
+import org.readium.r2.testapp.setup.copyPubFromAPKToDeviceInternalMemory
+import org.readium.r2.testapp.setup.getStr
+import org.readium.r2.testapp.setup.initTestEnv
+import org.readium.r2.testapp.setup.remPubsFromDeviceInternalMemory
+import org.readium.r2.testapp.setup.scrollUntilFoundTextAndClickUiAutomator
+import org.readium.r2.testapp.setup.waitFor
 
 
 @RunWith(AndroidJUnit4::class)
@@ -65,7 +70,7 @@ class AddLocalBook
     }
 
     /**
-     * Resets the imported database, imports the publication then waits some time
+     * Reset the imported database, imports the publication then waits some time.
      */
     fun importTestPublication(pub: String) {
         copyPubFromAPKToDeviceInternalMemory(pub)
@@ -76,7 +81,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests that a valid publication could be imported by checking that there is a cover image view
+     * Test that a valid publication could be imported by checking that there is a cover image view.
      */
     fun importTestPublicationWorks(pub: String) {
         importTestPublication(pub)
@@ -84,7 +89,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests that an invalid publication could not be imported by checking that
+     * Test that an invalid publication could not be imported by checking that.
      */
     fun importTestPublicationFail(pub: String) {
         importTestPublication(pub)
@@ -92,7 +97,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a Local CBZ that is valid can be added.
+     * Test if a Local CBZ that is valid can be added.
      */
     @Test
     fun importLocalCBZPWorks() {
@@ -100,7 +105,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a Local EPub that is valid can be added.
+     * Test if a Local EPub that is valid can be added.
      */
     @Test
     fun importLocalEPubWorks() {
@@ -108,7 +113,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a Local Audiobook that is valid can be added.
+     * Test if a Local Audiobook that is valid can be added.
      */
     @Test
     fun importLocalAudioBookWorks() {
@@ -116,7 +121,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a Local DiViNa webtoon with manifest that is valid can be added.
+     * Test if a Local DiViNa webtoon with manifest that is valid can be added.
      */
     @Test
     fun importLocalDivinaManifestWebtoonWorks() {
@@ -124,7 +129,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a Local DiViNa webtoon with publication that is valid can be added.
+     * Test if a Local DiViNa webtoon with publication that is valid can be added.
      */
     @Test
     fun importLocalDivinaPublicationWebtoonWorks() {
@@ -132,7 +137,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a Local DiViNa turbomedia with manifest that is valid can be added.
+     * Test if a Local DiViNa turbomedia with manifest that is valid can be added.
      */
     @Test
     fun importLocalDivinaManifestTurbomediaWorks() {
@@ -140,7 +145,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a Local DiViNa turbomedia with publication that is valid can be added.
+     * Test if a Local DiViNa turbomedia with publication that is valid can be added.
      */
     @Test
     fun importLocalDivinaPublicationTurbomediaWorks() {
@@ -153,7 +158,7 @@ class AddLocalBook
      */
     /*
     /**
-     * Tests if a local Invalid CBZ fails as it should
+     * Test if a local Invalid CBZ fails as it should.
      */
     @Test
     fun importLocalCBZPublicationFail() {
@@ -161,7 +166,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a local Invalid Epub (empty zipped) fails as it should
+     * Test if a local Invalid Epub (empty zipped) fails as it should.
      */
     @Test
     fun importLocalEpubPublicationFail() {
@@ -169,7 +174,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a local Invalid Audiobook (empty zipped) fails as it should
+     * Test if a local Invalid Audiobook (empty zipped) fails as it should.
      */
     @Test
     fun importLocalAudiobookPublicationFail() {
@@ -177,7 +182,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a local Invalid DiViNa (empty zipped) fails as it should
+     * Test if a local Invalid DiViNa (empty zipped) fails as it should.
      */
     @Test
     fun importLocalDivinaPublicationFail() {
@@ -185,7 +190,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a local Invalid empty CBZ fails as it should
+     * Test if a local Invalid empty CBZ fails as it should.
      */
     @Test
     fun importLocalEmptyCBZPublicationFail() {
@@ -193,7 +198,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a local Invalid empty Epub fails as it should
+     * Test if a local Invalid empty Epub fails as it should.
      */
     @Test
     fun importLocalEmptyEpubPublicationFail() {
@@ -201,7 +206,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a local Invalid empty Audiobook fails as it should
+     * Test if a local Invalid empty Audiobook fails as it should.
      */
     @Test
     fun importLocalEmptyAudiobookPublicationFail() {
@@ -209,7 +214,7 @@ class AddLocalBook
     }
 
     /**
-     * Tests if a local Invalid empty DiViNa fails as it should
+     * Test if a local Invalid empty DiViNa fails as it should.
      */
     @Test
     fun importLocalEmptyDivinaPublicationFail() {

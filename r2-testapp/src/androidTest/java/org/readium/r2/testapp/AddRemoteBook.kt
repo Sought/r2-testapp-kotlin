@@ -9,10 +9,12 @@ package org.readium.r2.testapp
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.filters.LargeTest
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withTagValue
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -40,7 +42,7 @@ class AddRemoteBook
     }
 
     /**
-     * Contains the code that will open the add publication dialog and fills it,
+     * Contain the code that will open the add publication dialog and fill it,
      * before pressing the ADD button.
      *
      * pubURL: String - The publication URL
@@ -55,7 +57,7 @@ class AddRemoteBook
     }
 
     /**
-     * Core test function. It calls setupImportPublication, then looks if the result is displayed.
+     * Core test function. Call setupImportPublication, then look if the result is displayed.
      *
      * pubUrl: String - The publication URL
      * displayName: String - The displayed name of the added publication
@@ -67,7 +69,7 @@ class AddRemoteBook
     }
 
     /**
-     * Tests if a remote Audiobook that is valid can be added.
+     * Test if a remote Audiobook that is valid can be added.
      */
     @Test
     fun importRemoteAudioBookPublicationWorks() {
@@ -76,7 +78,7 @@ class AddRemoteBook
     }
 
     /**
-     * Tests if a remote web publication that is valid can be added.
+     * Test if a remote web publication that is valid can be added.
      */
     @Test
     fun importRemoteWebPublicationWorks() {
@@ -85,7 +87,7 @@ class AddRemoteBook
     }
 
     /**
-     * Tests if a remote OPDS2 that is valid can be added.
+     * Test if a remote OPDS2 that is valid can be added.
      */
     @Test
     fun importRemoteOPDS2Works() {
@@ -94,7 +96,7 @@ class AddRemoteBook
     }
 
     /**
-     * Tests that an invalid link can't be added and does not crash the testapp.
+     * Test that an invalid link can't be added and does not crash the testapp.
      */
     @Test
     fun importRemotePublicationFail() {

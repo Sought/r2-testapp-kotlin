@@ -6,20 +6,28 @@
 
 package org.readium.r2.testapp
 
+import android.app.Activity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.filters.LargeTest
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.readium.r2.testapp.library.LibraryActivity
-import org.readium.r2.testapp.setup.*
+import org.readium.r2.testapp.setup.addPubToDatabase
+import org.readium.r2.testapp.setup.copyPubFromAPKToDeviceInternalMemory
+import org.readium.r2.testapp.setup.getStr
+import org.readium.r2.testapp.setup.initTestEnv
+import org.readium.r2.testapp.setup.remPubsFromDeviceInternalMemory
+import org.readium.r2.testapp.setup.waitFor
 import org.hamcrest.CoreMatchers.`is` as Is
 
 
@@ -40,9 +48,9 @@ class AudiobookTests {
     }
 
     /**
-     * Gets the current running LibraryActivity
+     * Get the current running LibraryActivity.
      */
-    private fun getActivity(): LibraryActivity? {
+    private fun getActivity(): Activity? {
         var activity: LibraryActivity? = null
         activityScenarioRule.scenario.onActivity {
             activity = it
@@ -52,14 +60,14 @@ class AudiobookTests {
 
     private fun addTestAudiobook(pub: String) {
         copyPubFromAPKToDeviceInternalMemory(pub)
-        addPubToDatabase(pub, getActivity())
+        addPubToDatabase(pub, getActivity() as LibraryActivity)
         waitFor(1000)
 
         onView(withText(getStr(R.string.audiobookTestName))).perform(ViewActions.click())
     }
 /*
     /**
-     * Tests that the play and pause button swap as they should.
+     * Test that the play and pause button swap as they should.
      */
     @Test
     fun testPlayPauseSwaps() {
@@ -72,7 +80,7 @@ class AudiobookTests {
     }
 
     /**
-     * Tests that changing orientation doesn't resume playing if stopped before.
+     * Test that changing orientation doesn't resume playing if stopped before.
      */
     @Test
     fun testPauseSwapOrientation() {
@@ -90,7 +98,7 @@ class AudiobookTests {
 
 
     /**
-     * Tests that changing orientation doesn't pause the book playback.
+     * Test that changing orientation doesn't pause the book playback.
      */
     @Test
     fun testPlaySwapOrientation() {
@@ -105,7 +113,7 @@ class AudiobookTests {
     }
 
     /**
-     * Tests that a bookmark can be added
+     * Test that a bookmark can be added.
      */
     @Test
     fun testBookmarkSimple() {
@@ -118,7 +126,7 @@ class AudiobookTests {
     }*/
 
     /**
-     * Tests that the TOC works for the middle chapter
+     * Test that the TOC works for the last chapter.
      */
     @Test
     fun testTOC() {
@@ -129,7 +137,7 @@ class AudiobookTests {
     }
 
     /**
-     * Tests that the previous chapter arrow works for the middle chapter
+     * Test that the previous chapter arrow works for the middle chapter.
      */
     @Test
     fun testPrevChapMiddle() {
@@ -141,7 +149,7 @@ class AudiobookTests {
     }
 
     /**
-     * Tests that the next chapter arrow works for the middle chapter
+     * Test that the next chapter arrow works for the middle chapter.
      */
     @Test
     fun testNextChapMiddle() {
@@ -153,7 +161,7 @@ class AudiobookTests {
     }
 
     /**
-     * Tests that the next chapter arrow works for the last chapter
+     * Test that the next chapter arrow works for the last chapter.
      */
     @Test
     fun testNextChapEnd() {
@@ -165,7 +173,7 @@ class AudiobookTests {
     }
 
     /**
-     * Tests that the previous chapter arrow works for the first chapter
+     * Test that the previous chapter arrow works for the first chapter.
      */
     @Test
     fun testPrevChapBeginning() {
@@ -176,4 +184,31 @@ class AudiobookTests {
         onView(withText("00 - Dedication")).check(matches(isDisplayed()))
     }
 
+    @Test
+    fun testForward() {
+        addTestAudiobook(getStr(R.string.audiobookTestFile))
+        onView(withId(Is(R.id.play_pause))).perform(ViewActions.click())
+        onView(withId(Is(R.id.fast_forward))).perform(ViewActions.click())
+        onView(withText("0:10")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun testForwardAndBackward() {
+        addTestAudiobook(getStr(R.string.audiobookTestFile))
+        onView(withId(Is(R.id.play_pause))).perform(ViewActions.click())
+        onView(withId(Is(R.id.fast_forward))).perform(ViewActions.click())
+        onView(withId(Is(R.id.fast_back))).perform(ViewActions.click())
+        onView(withText("0:0")).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun testBackwardAt5Seconds() {
+        addTestAudiobook(getStr(R.string.audiobookTestFile))
+        waitFor(5000)
+        onView(withId(Is(R.id.play_pause))).perform(ViewActions.click())
+        onView(withId(Is(R.id.fast_back))).perform(ViewActions.click())
+        onView(withText("0:5")).check(matches(isDisplayed()))
+    }
+
+    // TODO: ADD DRAG BAR TESTS
 }

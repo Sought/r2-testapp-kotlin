@@ -18,6 +18,7 @@ import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withTagValue
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -43,6 +44,8 @@ import org.readium.r2.testapp.setup.initTestEnv
 import org.readium.r2.testapp.setup.remPubsFromDeviceInternalMemory
 import org.readium.r2.testapp.setup.scrollUntilFoundTextAndClickUiAutomator
 import org.readium.r2.testapp.setup.waitFor
+import org.readium.r2.testapp.setup.withRecyclerViewSize
+import org.hamcrest.CoreMatchers.`is` as Is
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -88,6 +91,8 @@ class EPUBTests {
 
     /**
      * Returns the whole text (without html) contained inside a webview.
+     *
+     * @return: String - The content of the webview
      */
     private fun getWebViewStr(): String {
         val mDevice : UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
@@ -157,6 +162,9 @@ class EPUBTests {
         onView(withId(R.id.toc)).perform(ViewActions.click())
     }
 
+    /**
+     * Perform all the UI actions to access the settings interface.
+     */
     private fun goToSettings() {
         waitFor(1000)
         clickCenter(R.id.resourcePager)
@@ -178,10 +186,13 @@ class EPUBTests {
     /**
      * Perform all the UI actions to access the Search interface.
      */
-    private fun goToSearch() {
+    private fun doSearch(toSearch: String) {
         waitFor(1000)
         clickCenter(R.id.resourcePager)
+        waitFor(1000)
         onView(withId(R.id.search)).perform(ViewActions.click())
+        onView(withId(R.id.search_src_text)).perform(ViewActions.typeText(toSearch))
+        onView(withId(R.id.search_src_text)).perform(ViewActions.pressImeActionButton())
     }
 
     /**
@@ -253,61 +264,44 @@ class EPUBTests {
         onView(withId(R.id.screen_reader)).perform(ViewActions.click())
         onView(withId(R.id.play_pause)).check(matches(not(isDisplayed())))
     }
-/*
+
     /**
-     *
+     * Test that text is visible when launching tts.
      */
     @Test
     fun ttsTextVisible() {
         addTestEPUB(getStr(R.string.epubTestFile))
         goToTTS()
-
-        onView(withId(R.id.TextAlignment)).perform(ViewActions.click())
+        onView(withText("Jeanne Loiseau")).check(matches(isDisplayed()))
     }
 
     /**
-     *
+     * Test that pressing multiple times the play/pause button does not change the icon to the incorrect one.
      */
     @Test
     fun ttsPressPlayPause() {
         addTestEPUB(getStr(R.string.epubTestFile))
         goToTTS()
 
+        for (x in 0..8) // 9 iterations
+            onView(withId(R.id.play_pause)).perform(ViewActions.click())
 
+        onView(withTagValue(Is("playButton"))).check(matches(isDisplayed()))
     }
 
     /**
-     *
+     * Test that swiping multiple times in the tts interface does not change the play/pause button.
      */
     @Test
-    fun ttwSwipe() {
+    fun ttsSwipe() {
         addTestEPUB(getStr(R.string.epubTestFile))
         goToTTS()
 
+        for (x in 0..9)
+            swipeRTL(R.id.resourcePager)
+
+        onView(withTagValue(Is("pauseButton"))).check(matches(isDisplayed()))
     }
-
-    /**
-     *
-     */
-    @Test
-    fun ttsSwipeAndPressPlayPause() {
-        addTestEPUB(getStr(R.string.epubTestFile))
-        goToTTS()
-
-    }
-
-
-
-    /**
-     *
-     */
-    @Test
-    fun ttsSwipeAndPressPlayPauseMultiple() {
-        addTestEPUB(getStr(R.string.epubTestFile))
-        goToTTS()
-
-    }
-    */
 
     /**
      * Test that going to the first chapter through the TOC works.
@@ -432,7 +426,7 @@ class EPUBTests {
     }
 
     /**
-     *
+     * Test that setting text justified works as intended.
      */
     @Test
     fun settingsTextJustified() {
@@ -447,6 +441,9 @@ class EPUBTests {
 
     }
 
+    /**
+     * Test that setting left allignment works as intended.
+     */
     @Test
     fun settingsTextLeft() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -459,6 +456,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting auto columns works as intended.
+     */
     @Test
     fun settingsAutoColumns() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -472,6 +472,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting one column works as intended.
+     */
     @Test
     fun settingsOneColumn() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -485,6 +488,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting two columns works as intended.
+     */
     @Test
     fun settingsTwoColumns() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -498,6 +504,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting min page margins works as intended.
+     */
     @Test
     fun settingsMinPageMargin() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -518,6 +527,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting max page margin works as intended.
+     */
     @Test
     fun settingsMaxPageMargin() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -540,6 +552,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting min word spacing works as intended.
+     */
     @Test
     fun settingsMinWordSpacing() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -549,11 +564,13 @@ class EPUBTests {
         onView(withId(R.id.ws_decrease)).perform(ViewActions.click())
         pressBack()
 
-
         swipeRTL(R.id.resourcePager)
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting max word spacing works as intended
+     */
     @Test
     fun settingsMaxWordSpacing() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -571,6 +588,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting min letter spacing works as intended.
+     */
     @Test
     fun settingsMinLetterSpacing() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -584,6 +604,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting max letter spacing works as intended.
+     */
     @Test
     fun settingsMaxLetterSpacing() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -606,6 +629,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting minimum line height works as intended.
+     */
     @Test
     fun settingsMinLineHeight() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -619,6 +645,9 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that setting maximum line height works as intended.
+     */
     @Test
     fun settingsMaxLineHeight() {
         addTestEPUB(getStr(R.string.epubTestFile))
@@ -637,79 +666,140 @@ class EPUBTests {
         swipeRTL(R.id.resourcePager)
     }
 
+    /**
+     * Test that searching for a word that is not present works as intended.
+     */
     @Test
     fun searchSimpleNoResult() {
         addTestEPUB(getStr(R.string.epubTestFile))
-        goToSearch()
-        onView(with).perform(ViewActions.typeText("alibaba"))
-        onView(withId(R.id.text)).perform(ViewActions.pressImeActionButton())
-        waitFor(20000)
-        //onView(withTe)
+        doSearch("alibaba")
+
+        onView(withId(R.id.text)).check(doesNotExist())
     }
 
+    /**
+     * Test that searching for a Lorem Ipsum paragraph does not crash the app.
+     */
     @Test
     fun searchLongNoResult() {
         addTestEPUB(getStr(R.string.epubTestFile))
-
+        doSearch(getStr(R.string.lorem_ipsum))
+        onView(withId(R.id.text)).check(doesNotExist())
     }
 
+    /**
+     * Test that searching for a word returns the right amount of elements.
+     */
     @Test
     fun searchSimpleResult() {
         addTestEPUB(getStr(R.string.epubTestFile))
-
+        doSearch("les")
+        onView(withId(R.id.search_listView)).check(matches(withRecyclerViewSize(495)))
     }
 
+    /**
+     * Test that searching for a sentance finds all the words.
+     */
     @Test
     fun searchLongResult() {
         addTestEPUB(getStr(R.string.epubTestFile))
-
+        doSearch("La vaste place, les grandes voies qui y aboutissent, le lourd et somptueux")
+        waitFor(10000)
+        onView(withId(R.id.search_listView)).check(matches(withRecyclerViewSize(15594)))
     }
 
+    /**
+     * Test that searching a backslash doesn't crash the app.
+     */
     @Test
     fun searchBackslash() {
         addTestEPUB(getStr(R.string.epubTestFile))
-
+        doSearch("\\")
     }
 
+    /**
+     * Test that searching a double quote does not crash the app.
+     */
     @Test
     fun searchDoubleQuotes() {
         addTestEPUB(getStr(R.string.epubTestFile))
+        doSearch("\"")
 
     }
 
+    /**
+     * Test that searching two slashes does not crash the app.
+     */
     @Test
     fun searchDoubleSlash() {
         addTestEPUB(getStr(R.string.epubTestFile))
+        doSearch("//")
 
     }
 
+    /**
+     * Test that searching two backslashes does not crash the app.
+     */
     @Test
     fun searchTwoBackSlash() {
         addTestEPUB(getStr(R.string.epubTestFile))
-
+        doSearch("\\\\")
     }
 
+    /**
+     * Test that searching a word in Cyrillic does not crash the app.
+     */
     @Test
     fun searchCyrillic() {
         addTestEPUB(getStr(R.string.epubTestFile))
 
+        waitFor(1000)
+        clickCenter(R.id.resourcePager)
+        waitFor(1000)
+        onView(withId(R.id.search)).perform(ViewActions.click())
+        onView(withId(R.id.search_src_text)).perform(ViewActions.replaceText("классическая"))
+        onView(withId(R.id.search_src_text)).perform(ViewActions.pressImeActionButton())
     }
 
+    /**
+     * Test that searching a work in Kanji does not crash the app.
+     */
     @Test
     fun searchKanji() {
         addTestEPUB(getStr(R.string.epubTestFile))
-
+        waitFor(1000)
+        clickCenter(R.id.resourcePager)
+        waitFor(1000)
+        onView(withId(R.id.search)).perform(ViewActions.click())
+        onView(withId(R.id.search_src_text)).perform(ViewActions.replaceText("ロレム・イプサム"))
+        onView(withId(R.id.search_src_text)).perform(ViewActions.pressImeActionButton())
     }
 
+    /**
+     * Test that searching a work in arabic does not crash the app.
+     */
     @Test
     fun searchArab() {
         addTestEPUB(getStr(R.string.epubTestFile))
-
+        waitFor(1000)
+        clickCenter(R.id.resourcePager)
+        waitFor(1000)
+        onView(withId(R.id.search)).perform(ViewActions.click())
+        onView(withId(R.id.search_src_text)).perform(ViewActions.replaceText("خلافاَ للاعتقاد"))
+        onView(withId(R.id.search_src_text)).perform(ViewActions.pressImeActionButton())
     }
 
+    /**
+     * Test that searching an emoji does not crash the app.
+     */
     @Test
     fun searchEmoji() {
         addTestEPUB(getStr(R.string.epubTestFile))
-
+        waitFor(1000)
+        clickCenter(R.id.resourcePager)
+        waitFor(1000)
+        onView(withId(R.id.search)).perform(ViewActions.click())
+        onView(withId(R.id.search_src_text)).perform(ViewActions.replaceText("👦"))
+        onView(withId(R.id.search_src_text)).perform(ViewActions.pressImeActionButton())
     }
 }

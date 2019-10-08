@@ -46,5 +46,6 @@
     <string name="playButton" translatable="false">PlayButton</string>
     <string name="pauseButton" translatable="false">PauseButton</string>
 
+    <string name="lorem_ipsum" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam tincidunt tortor non dolor aliquet tristique. Pellentesque bibendum, lacus quis fermentum maximus, sem orci tempus felis, ac elementum nibh nulla ultrices ligula. Vivamus mattis, augue in convallis pulvinar, neque est dapibus augue, non scelerisque lacus diam at magna. Sed urna dui, convallis nec fringilla a, auctor in neque. Etiam quis semper enim. Donec ac elit viverra, condimentum dui ac, laoreet tortor. Duis ac euismod turpis, ut scelerisque diam. Quisque commodo turpis in justo euismod, finibus cursus lectus dictum.</string>
 
 </resources>

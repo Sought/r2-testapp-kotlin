@@ -41,7 +41,14 @@ import org.json.JSONObject
 import org.readium.r2.navigator.epub.R2EpubActivity
 import org.readium.r2.navigator.pager.R2EpubPageFragment
 import org.readium.r2.navigator.pager.R2PagerAdapter
-import org.readium.r2.shared.*
+import org.readium.r2.shared.APPEARANCE_REF
+import org.readium.r2.shared.ContentLayoutStyle
+import org.readium.r2.shared.Locations
+import org.readium.r2.shared.Locator
+import org.readium.r2.shared.LocatorText
+import org.readium.r2.shared.ReadiumCSSName
+import org.readium.r2.shared.RenditionLayout
+import org.readium.r2.shared.SCROLL_REF
 import org.readium.r2.shared.drm.DRM
 import org.readium.r2.testapp.DRMManagementActivity
 import org.readium.r2.testapp.R
@@ -124,9 +131,11 @@ class EpubActivity : R2EpubActivity(), CoroutineScope {
             if (screenReader.isPaused) {
                 screenReader.resume()
                 play_pause.setImageResource(android.R.drawable.ic_media_pause)
+                play_pause.tag = "pauseButton"
             } else {
                 screenReader.pause()
                 play_pause.setImageResource(android.R.drawable.ic_media_play)
+                play_pause.tag = "playButton"
             }
         }
         fast_forward.setOnClickListener {
@@ -141,10 +150,12 @@ class EpubActivity : R2EpubActivity(), CoroutineScope {
             screenReader.nextResource()
             screenReader.start()
             play_pause.setImageResource(android.R.drawable.ic_media_pause)
+            play_pause.tag = "pauseButton"
         }
         fast_back.setOnClickListener {
             if (screenReader.previousSentence()) {
                 play_pause.setImageResource(android.R.drawable.ic_media_pause)
+                play_pause.tag = "pauseButton"
             } else {
                 prev_chapter.callOnClick()
             }
@@ -154,6 +165,7 @@ class EpubActivity : R2EpubActivity(), CoroutineScope {
             screenReader.previousResource()
             screenReader.start()
             play_pause.setImageResource(android.R.drawable.ic_media_pause)
+            play_pause.tag = "pauseButton"
         }
 
 

@@ -6,17 +6,35 @@
 
 package org.readium.r2.testapp.setup
 
+import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiSelector
-import org.jetbrains.anko.db.*
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiScrollable
-import org.readium.r2.testapp.db.*
+import androidx.test.uiautomator.UiSelector
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.TypeSafeMatcher
+import org.jetbrains.anko.db.AUTOINCREMENT
+import org.jetbrains.anko.db.BLOB
+import org.jetbrains.anko.db.INTEGER
+import org.jetbrains.anko.db.PRIMARY_KEY
+import org.jetbrains.anko.db.TEXT
+import org.jetbrains.anko.db.createTable
+import org.readium.r2.testapp.db.BOOKMARKSTable
+import org.readium.r2.testapp.db.BOOKSTable
+import org.readium.r2.testapp.db.BookmarksDatabase
+import org.readium.r2.testapp.db.BooksDatabase
+import org.readium.r2.testapp.db.POSITIONSTable
+import org.readium.r2.testapp.db.PositionsDatabase
 import org.readium.r2.testapp.library.LibraryActivity
-import java.io.*
-import java.util.*
-
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.util.UUID
 
 /**
  * Initializes the testing environment by destroying the Books, bookmarks and positions tables, and
@@ -171,3 +189,19 @@ fun addPubToDatabase(pub: String, activity: LibraryActivity?) {
     val input = getInstrumentation().context.assets.open(pub)
     method.invoke(activity, pub, uuid, outputFilePath, input)
 }
+
+fun withRecyclerViewSize(size: Int): Matcher<View> {
+    return object : TypeSafeMatcher<View>() {
+
+        override fun matchesSafely(view: View): Boolean {
+            val actualListSize = (view as RecyclerView).adapter!!.itemCount
+            Log.e(TAG, "RecyclerView actual size $actualListSize")
+            return actualListSize == size
+        }
+
+        override fun describeTo(description: Description) {
+            description.appendText("RecyclerView should have $size items")
+        }
+    }
+}
+

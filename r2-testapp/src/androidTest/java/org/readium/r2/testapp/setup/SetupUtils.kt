@@ -7,6 +7,7 @@
 package org.readium.r2.testapp.setup
 
 import android.content.ContentValues.TAG
+import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

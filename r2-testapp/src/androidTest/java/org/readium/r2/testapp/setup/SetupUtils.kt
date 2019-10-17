@@ -41,8 +41,15 @@ import java.util.UUID
  * creating them again. Would be preferable to have a function to create it in the BooksDatabase.kt
  * file. It also allows permission to access the sdcard. This function allows the tests to run
  * without having to manually configure the app.
+ *
+ * As this function will always be called before any test, check device used is allowed for UI tests.
  */
 fun initTestEnv() {
+    when (Build.MODEL) {
+        "BTV-W09" -> Timber.d("Device model", "BTV-W09")
+        else -> Exception("Unsupported Device: ${Build.MODEL}")
+    }
+
     val db = BooksDatabase(getInstrumentation().targetContext)
     db.books.dropTable()
     db.shared.use {

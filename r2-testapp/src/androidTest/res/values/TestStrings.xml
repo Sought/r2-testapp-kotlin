@@ -32,6 +32,7 @@
     <string name="webtoonPublicationDiViNaTestFile" translatable="false">___webtoon_publication.divina</string>
     <string name="turbomediaManifestDiViNaTestFile" translatable="false">___turbomedia_manifest.divina</string>
     <string name="turbomediaPublicationDiViNaTestFile" translatable="false">___turbomedia_publication.divina</string>
+    <string name="divinaTestName" translatable="false">Mountains</string>
 
     <string name="invalidCBZFile" translatable="false">___invalid_pub.cbz</string>
     <string name="invalidEPubFile" translatable="false">___invalid_pub.epub</string>

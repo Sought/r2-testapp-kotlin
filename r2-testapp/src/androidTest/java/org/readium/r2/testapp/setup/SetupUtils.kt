@@ -9,10 +9,23 @@ package org.readium.r2.testapp.setup
 import android.content.ContentValues.TAG
 import android.os.Build
 import android.util.Log
+import android.view.InputDevice
+import android.view.MotionEvent
 import android.view.View
+import android.webkit.WebView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.action.GeneralClickAction
+import androidx.test.espresso.action.GeneralLocation
+import androidx.test.espresso.action.Press
+import androidx.test.espresso.action.Tap
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.UiScrollable
 import androidx.test.uiautomator.UiSelector
 import org.hamcrest.Description
@@ -24,6 +37,7 @@ import org.jetbrains.anko.db.INTEGER
 import org.jetbrains.anko.db.PRIMARY_KEY
 import org.jetbrains.anko.db.TEXT
 import org.jetbrains.anko.db.createTable
+import org.readium.r2.testapp.R
 import org.readium.r2.testapp.db.BOOKMARKSTable
 import org.readium.r2.testapp.db.BOOKSTable
 import org.readium.r2.testapp.db.BookmarksDatabase
@@ -31,6 +45,7 @@ import org.readium.r2.testapp.db.BooksDatabase
 import org.readium.r2.testapp.db.POSITIONSTable
 import org.readium.r2.testapp.db.PositionsDatabase
 import org.readium.r2.testapp.library.LibraryActivity
+import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -213,3 +228,88 @@ fun withRecyclerViewSize(size: Int): Matcher<View> {
     }
 }
 
+/**
+ * Perform a single click action on the view with the given ID.
+ *
+ * @param id: Int - The id of the object to swipe on.
+ */
+fun clickCenter(id: Int) {
+    Espresso.onView(ViewMatchers.withId(id)).perform(GeneralClickAction(Tap.SINGLE, GeneralLocation.CENTER,
+        Press.FINGER, InputDevice.SOURCE_ANY, MotionEvent.BUTTON_PRIMARY))
+}
+
+/**
+ * Perform all the UI actions to access the TOC interface.
+ */
+fun goToTOC() {
+    waitFor(1000)
+    clickCenter(R.id.resourcePager)
+    Espresso.onView(ViewMatchers.withId(R.id.toc)).perform(ViewActions.click())
+}
+
+/**
+ * Returns the whole text (without html) contained inside a webview.
+ *
+ * @return: String - The content of the webview
+ */
+fun getWebViewStr(): String {
+    val mDevice : UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+    val webView = mDevice.findObject(By.clazz(WebView::class.java))
+    val str = listAllChildren(webView)
+    Log.e("WebView text", str)
+    return str
+}
+
+/**
+ * Appends all the parts of the text together.
+ *
+ * @param obj: UiObject2 - The ui element containing the text we want.
+ */
+private fun listAllChildren(obj: UiObject2): String {
+    var str = obj.text
+
+    for (a in obj.children)
+        str += "\n" + listAllChildren(a)
+
+    return str
+}
+
+/**
+ * Click the middle of the right side of the UI element.
+ *
+ * @param id: Int - The id of the view to click on.
+ */
+fun clickRightSide(id: Int) {
+    Espresso.onView(ViewMatchers.withId(id))
+        .perform(GeneralClickAction(Tap.SINGLE, GeneralLocation.CENTER_RIGHT,Press.FINGER))// GeneralLocation.CENTER_RIGHT, Press.FINGER))
+}
+
+/**
+ * Click the middle of the left side of the UI element.
+ *
+ * @param id: Int - The id of the view to click on.
+ */
+fun clickLeftSide(id: Int) {
+    Espresso.onView(ViewMatchers.withId(id))
+        .perform(GeneralClickAction(Tap.SINGLE, GeneralLocation.CENTER_LEFT,Press.FINGER))
+}
+
+/**
+ * Click the middle of the top side of the UI element.
+ *
+ * @param id: Int - The id of the view to click on.
+ */
+fun clickTopSide(id: Int) {
+    Espresso.onView(ViewMatchers.withId(id))
+        .perform(GeneralClickAction(Tap.SINGLE, GeneralLocation.TOP_CENTER,Press.FINGER))
+}
+
+/**
+ * Click the middle of the bottom side of the UI element.
+ *
+ * @param id: Int - The id of the view to click on.
+ */
+fun clickBottomSide(id: Int) {
+    Espresso.onView(ViewMatchers.withId(id))
+        .perform(GeneralClickAction(Tap.SINGLE, GeneralLocation.BOTTOM_CENTER,Press.FINGER))
+}

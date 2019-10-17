@@ -1,18 +1,12 @@
 package org.readium.r2.testapp
 
 import android.app.Activity
-import android.util.Log
-import android.view.InputDevice
-import android.view.MotionEvent
-import android.webkit.WebView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
-import androidx.test.espresso.action.GeneralClickAction
 import androidx.test.espresso.action.GeneralLocation
 import androidx.test.espresso.action.GeneralSwipeAction
 import androidx.test.espresso.action.Press
 import androidx.test.espresso.action.Swipe
-import androidx.test.espresso.action.Tap
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -23,10 +17,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.UiScrollable
 import androidx.test.uiautomator.UiSelector
 import junit.framework.TestCase.assertTrue
@@ -38,8 +28,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.readium.r2.testapp.library.LibraryActivity
 import org.readium.r2.testapp.setup.addPubToDatabase
+import org.readium.r2.testapp.setup.clickCenter
 import org.readium.r2.testapp.setup.copyPubFromAPKToDeviceInternalMemory
 import org.readium.r2.testapp.setup.getStr
+import org.readium.r2.testapp.setup.getWebViewStr
+import org.readium.r2.testapp.setup.goToTOC
 import org.readium.r2.testapp.setup.initTestEnv
 import org.readium.r2.testapp.setup.remPubsFromDeviceInternalMemory
 import org.readium.r2.testapp.setup.scrollUntilFoundTextAndClickUiAutomator
@@ -90,33 +83,6 @@ class EPUBTests {
     }
 
     /**
-     * Returns the whole text (without html) contained inside a webview.
-     *
-     * @return: String - The content of the webview
-     */
-    private fun getWebViewStr(): String {
-        val mDevice : UiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val webView = mDevice.findObject(By.clazz(WebView::class.java))
-        val str = listAllChildren(webView)
-        Log.e("WebView text", str)
-        return str
-    }
-
-    /**
-     * Appends all the parts of the text together.
-     *
-     * @param obj: UiObject2 - The ui element containing the text we want.
-     */
-    private fun listAllChildren(obj: UiObject2): String {
-        var str = obj.text
-
-        for (a in obj.children)
-            str += "\n" + listAllChildren(a)
-
-        return str
-    }
-
-    /**
      * Perform a swipe action right to left on given view ID.
      *
      * @param id: Int - The id of the object to swipe on.
@@ -135,31 +101,12 @@ class EPUBTests {
     }
 
     /**
-     * Perform a single click action on the view with the given ID.
-     *
-     * @param id: Int - The id of the object to swipe on.
-     */
-    private fun clickCenter(id: Int) {
-        onView(withId(id)).perform(GeneralClickAction(Tap.SINGLE, GeneralLocation.CENTER, Press.FINGER,
-            InputDevice.SOURCE_ANY, MotionEvent.BUTTON_PRIMARY))
-    }
-
-    /**
      * Perform all the UI actions to access TTS interface.
      */
     private fun goToTTS() {
         waitFor(1000)
         clickCenter(R.id.resourcePager)
         onView(withId(R.id.screen_reader)).perform(ViewActions.click())
-    }
-
-    /**
-     * Perform all the UI actions to access the TOC interface.
-     */
-    private fun goToTOC() {
-        waitFor(1000)
-        clickCenter(R.id.resourcePager)
-        onView(withId(R.id.toc)).perform(ViewActions.click())
     }
 
     /**

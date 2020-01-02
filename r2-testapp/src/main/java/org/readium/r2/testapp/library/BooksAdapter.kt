@@ -19,10 +19,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import org.readium.r2.testapp.R
 import org.readium.r2.testapp.db.Book
+import org.readium.r2.testapp.utils.singleClick
 import java.io.ByteArrayInputStream
 
 
-open class BooksAdapter(private val activity: Activity, private var books: MutableList<Book>, private val server: String, private var itemListener: RecyclerViewClickListener) : RecyclerView.Adapter<BooksAdapter.ViewHolder>() {
+open class BooksAdapter(private val activity: Activity, private var books: MutableList<Book>, private var itemListener: RecyclerViewClickListener) : RecyclerView.Adapter<BooksAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = activity.layoutInflater
@@ -35,7 +36,7 @@ open class BooksAdapter(private val activity: Activity, private var books: Mutab
         val book = books[position]
 
         viewHolder.textView.text = book.title
-        viewHolder.textView.contentDescription = "\u00A0";
+        viewHolder.textView.contentDescription = "\u00A0"
 
         viewHolder.imageView.setImageResource(R.drawable.cover)
 
@@ -49,8 +50,7 @@ open class BooksAdapter(private val activity: Activity, private var books: Mutab
             viewHolder.imageView.setImageBitmap(bitmap)
         }
 
-        viewHolder.itemView.setOnClickListener { v ->
-            //get the position of the image which is clicked
+        viewHolder.itemView.singleClick { v->
             itemListener.recyclerViewListClicked(v, position)
         }
 

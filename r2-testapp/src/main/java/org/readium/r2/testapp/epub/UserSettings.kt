@@ -16,7 +16,6 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import org.json.JSONArray
@@ -31,7 +30,7 @@ import org.readium.r2.testapp.R
 import org.readium.r2.testapp.utils.color
 import java.io.File
 
-class UserSettings(var preferences: SharedPreferences, val context: Context, val UIPreset: MutableMap<ReadiumCSSName, Boolean>) {
+class UserSettings(var preferences: SharedPreferences, val context: Context, private val UIPreset: MutableMap<ReadiumCSSName, Boolean>) {
 
     lateinit var resourcePager: R2ViewPager
 
@@ -125,7 +124,7 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, val
 
     fun saveChanges() {
         val json = makeJson()
-        val dir = File(context.filesDir.path + "/"+ Injectable.Style.rawValue +"/")
+        val dir = File(context.filesDir.path + "/" + Injectable.Style.rawValue + "/")
         dir.mkdirs()
         val file = File(dir, "UserProperties.json")
         file.printWriter().use { out ->
@@ -154,19 +153,19 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, val
             val webView = resourcePager.getChildAt(i).findViewById(R.id.webView) as? R2WebView
             webView?.let {
                 applyCSS(webView, ref)
-            }?: run {
+            } ?: run {
                 val zoomView = resourcePager.getChildAt(i).findViewById(R.id.r2FXLLayout) as R2FXLLayout
                 val webView1 = zoomView.findViewById(R.id.firstWebView) as? R2BasicWebView
                 val webView2 = zoomView.findViewById(R.id.secondWebView) as? R2BasicWebView
                 val webViewSingle = zoomView.findViewById(R.id.webViewSingle) as? R2BasicWebView
 
-                webView1?.let{
+                webView1?.let {
                     applyCSS(webView1, ref)
                 }
-                webView2?.let{
+                webView2?.let {
                     applyCSS(webView2, ref)
                 }
-                webViewSingle?.let{
+                webViewSingle?.let {
                     applyCSS(webViewSingle, ref)
                 }
             }
@@ -289,7 +288,7 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, val
 
         UIPreset[ReadiumCSSName.appearance]?.let {
             appearanceGroup.isEnabled = false
-            for(appearanceRadio in appearanceRadios) {
+            for (appearanceRadio in appearanceRadios) {
                 appearanceRadio.isEnabled = false
             }
         } ?: run {
@@ -342,7 +341,7 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, val
 
         // Publisher defaults
         val publisherDefaultSwitch = layout.findViewById(R.id.publisher_default) as Switch
-        publisherDefaultSwitch.contentDescription = "\u00A0";
+        publisherDefaultSwitch.contentDescription = "\u00A0"
 
         publisherDefaultSwitch.isChecked = publisherDefault.on
         publisherDefaultSwitch.setOnCheckedChangeListener { _, b ->
@@ -361,29 +360,32 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, val
             scrollModeSwitch.isChecked = scrollMode.on
             scrollModeSwitch.setOnCheckedChangeListener { _, b ->
                 scrollMode.on = scrollModeSwitch.isChecked
-                (resourcePager.focusedChild?.findViewById(R.id.resource_end) as? TextView)?.visibility = View.GONE
-
-                val webView = resourcePager.focusedChild?.findViewById(R.id.webView) as? WebView
-                webView?.let {
-                    when (b) {
-                        true -> {
-                            resourcePager.focusedChild?.setPadding(0, 0, 0, 0)
-                        }
-                        false -> {
-                            resourcePager.focusedChild?.setPadding(0, 60, 0, 40)
-                        }
-                    }
-                } ?: run {
-                    resourcePager.focusedChild?.setPadding(0, 0, 0, 0)
-                }
 
                 updateSwitchable(scrollMode)
                 updateViewCSS(SCROLL_REF)
 
                 val currentFragment = (resourcePager.adapter as R2PagerAdapter).getCurrentFragment()
+                val previousFragment = (resourcePager.adapter as R2PagerAdapter).getPreviousFragment()
+                val nextFragment = (resourcePager.adapter as R2PagerAdapter).getNextFragment()
                 if (currentFragment is R2EpubPageFragment) {
                     currentFragment.webView.scrollToPosition(currentFragment.webView.progression)
+                    (previousFragment as? R2EpubPageFragment)?.webView?.scrollToEnd()
+                    (nextFragment as? R2EpubPageFragment)?.webView?.scrollToStart()
                     currentFragment.webView.setScrollMode(b)
+                    (previousFragment as? R2EpubPageFragment)?.webView?.setScrollMode(b)
+                    (nextFragment as? R2EpubPageFragment)?.webView?.setScrollMode(b)
+                    when (b) {
+                        true -> {
+                            currentFragment.view?.setPadding(0, 0, 0, 0)
+                            previousFragment?.view?.setPadding(0, 0, 0, 0)
+                            nextFragment?.view?.setPadding(0, 0, 0, 0)
+                        }
+                        false -> {
+                            currentFragment.view?.setPadding(0, 60, 0, 40)
+                            previousFragment?.view?.setPadding(0, 60, 0, 40)
+                            nextFragment?.view?.setPadding(0, 60, 0, 40)
+                        }
+                    }
                 }
             }
         }
@@ -401,7 +403,7 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, val
         UIPreset[ReadiumCSSName.textAlignment]?.let {
             alignmentGroup.isEnabled = false
             alignmentGroup.isActivated = false
-            for(alignmentRadio in alignmentRadios) {
+            for (alignmentRadio in alignmentRadios) {
                 alignmentRadio.isEnabled = false
             }
         } ?: run {
@@ -443,7 +445,7 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, val
         UIPreset[ReadiumCSSName.columnCount]?.let {
             columnsCountGroup.isEnabled = false
             columnsCountGroup.isActivated = false
-            for(columnRadio in columnsRadios) {
+            for (columnRadio in columnsRadios) {
                 columnRadio.isEnabled = false
             }
         } ?: run {
@@ -587,6 +589,33 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, val
 
                     override fun onStopTrackingTouch(bar: SeekBar) {
                         // Nothing
+                    }
+                })
+
+        // Speech speed
+        val speechSeekBar = layout.findViewById(R.id.TTS_speech_speed) as SeekBar
+
+        //Get the user settings value or set the progress bar to a neutral position (1 time speech speed).
+        val speed = preferences.getInt("reader_TTS_speed", (2.75 * 3.toDouble() / 11.toDouble() * 100).toInt())
+
+        speechSeekBar.progress = speed
+        speechSeekBar.setOnSeekBarChangeListener(
+                object : SeekBar.OnSeekBarChangeListener {
+
+                    override fun onProgressChanged(bar: SeekBar, progress: Int, from_user: Boolean) {
+                        // Nothing
+                    }
+
+                    override fun onStartTrackingTouch(bar: SeekBar) {
+                        // Nothing
+                    }
+
+                    override fun onStopTrackingTouch(bar: SeekBar) {
+                        //Convert seekBar percent to a float value between 0.25 and 3.
+                        val speechSpeed = 0.25.toFloat() + (bar.progress.toFloat() / 100.toFloat()) * 2.75.toFloat()
+                        preferences.edit().putInt("reader_TTS_speed", bar.progress).apply()
+                        // TODO this might need to be refactored
+                        (context as EpubActivity).updateScreenReaderSpeed(speechSpeed, true)
                     }
                 })
 

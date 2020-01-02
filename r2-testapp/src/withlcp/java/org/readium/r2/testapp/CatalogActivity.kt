@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.design.longSnackbar
+import org.readium.r2.testapp.BuildConfig.DEBUG
 import org.readium.r2.lcp.public.*
 import org.readium.r2.shared.Injectable
 import org.readium.r2.shared.Publication
@@ -57,17 +58,17 @@ class CatalogActivity : LibraryActivity(), LCPLibraryActivityService, CoroutineS
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
-    lateinit var lcpService: LCPService
+    private lateinit var lcpService: LCPService
 
-    private var currenProgressDialog:ProgressDialog? = null
+    private var currenProgressDialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        lcpService = R2MakeLCPService(this)
         super.onCreate(savedInstanceState)
         listener = this
-        lcpService = R2MakeLCPService(this)
     }
 
-    internal var authenticationCallbacks: MutableMap<String, (String?) -> Unit> = mutableMapOf()
+    private var authenticationCallbacks: MutableMap<String, (String?) -> Unit> = mutableMapOf()
 
     override val brand: DRM.Brand
         get() = DRM.Brand.lcp
@@ -159,24 +160,24 @@ class CatalogActivity : LibraryActivity(), LCPLibraryActivityService, CoroutineS
                 val forgotButton = customView.findViewById(R.id.forgot_link) as Button
                 val helpButton = customView.findViewById(R.id.help_link) as Button
 
-                if(license.supportLinks.isEmpty()) {
+                if (license.supportLinks.isEmpty()) {
                     helpButton.visibility = View.GONE
                 } else {
                     helpButton.visibility = View.VISIBLE
                 }
 
                 when (reason) {
-                        "passphraseNotFound" -> title.text = "Passphrase Required"
-                        "invalidPassphrase" -> {
-                            title.text = "Incorrect Passphrase"
-                            passwordLayout.error = "Incorrect Passphrase"
+                    "passphraseNotFound" -> title.text = "Passphrase Required"
+                    "invalidPassphrase" -> {
+                        title.text = "Incorrect Passphrase"
+                        passwordLayout.error = "Incorrect Passphrase"
                     }
                 }
 
-                val provider =  try {
+                val provider = try {
                     val test = URL(license.provider)
                     URL(license.provider).host
-                } catch (e:Exception){
+                } catch (e: Exception) {
                     license.provider
                 }
 
@@ -226,7 +227,7 @@ class CatalogActivity : LibraryActivity(), LCPLibraryActivityService, CoroutineS
                                                     "mailto" -> "Mail"
                                                     else -> "Support"
                                                 }
-                                            } catch (e:Exception) {
+                                            } catch (e: Exception) {
                                                 "Support"
                                             }
                                         }
@@ -239,7 +240,7 @@ class CatalogActivity : LibraryActivity(), LCPLibraryActivityService, CoroutineS
                                                     "mailto" -> Intent(Intent.ACTION_SEND)
                                                     else -> Intent(Intent.ACTION_VIEW)
                                                 }
-                                            } catch (e:Exception) {
+                                            } catch (e: Exception) {
                                                 Intent(Intent.ACTION_VIEW)
                                             }
                                             intent.data = Uri.parse(link.href)
@@ -271,38 +272,46 @@ class CatalogActivity : LibraryActivity(), LCPLibraryActivityService, CoroutineS
             progress.show()
 
             currenProgressDialog = progress
+            Thread {
+                val bytes = try {
+                    URL(uri.toString()).openStream().readBytes()
+                } catch (e: Exception) {
+                    contentResolver.openInputStream(uri)?.readBytes()
+                }
 
-            val bytes = URL(uri.toString()).openStream().readBytes()
-            fulfill(bytes) { result ->
-                if (result is Exception) {
+                bytes?.let { it1 ->
+                    fulfill(it1) { result ->
+                        if (result is Exception) {
 
-                    progress.dismiss()
-                    catalogView.longSnackbar("${(result as LCPError).errorDescription}")
+                            progress.dismiss()
+                            catalogView.longSnackbar("${(result as LCPError).errorDescription}")
 
-                } else {
-                    result?.let {
-                        val publication = result as DRMFulfilledPublication
+                        } else {
+                            result?.let {
+                                val publication = result as DRMFulfilledPublication
 
-                        Timber.d(publication.localURL)
-                        Timber.d(publication.suggestedFilename)
-                        val file = File(publication.localURL)
-                        launch {
-                            val parser = EpubParser()
-                            val pub = parser.parse(publication.localURL)
-                            pub?.let {
-                                val pair = parser.fillEncryption(pub.container, pub.publication, pub.container.drm)
-                                pub.container = pair.first
-                                pub.publication = pair.second
-                                prepareToServe(pub, file.name, file.absolutePath, add = true, lcp = true)
+                                if (DEBUG) Timber.d(publication.localURL)
+                                if (DEBUG) Timber.d(publication.suggestedFilename)
+                                val file = File(publication.localURL)
+                                launch {
+                                    val parser = EpubParser()
+                                    val pub = parser.parse(publication.localURL)
+                                    pub?.let {
+                                        val pair = parser.fillEncryption(pub.container, pub.publication, pub.container.drm)
+                                        pub.container = pair.first
+                                        pub.publication = pair.second
+                                        prepareToServe(pub, file.name, file.absolutePath, add = true, lcp = true)
+                                        progress.dismiss()
+                                        catalogView.longSnackbar("publication added to your library")
+                                    }
+                                }
+                            } ?: run {
                                 progress.dismiss()
-                                catalogView.longSnackbar("publication added to your library")
                             }
                         }
-                    } ?: run {
-                        progress.dismiss()
                     }
                 }
-            }
+            }.start()
         }
     }
 
@@ -317,7 +326,7 @@ class CatalogActivity : LibraryActivity(), LCPLibraryActivityService, CoroutineS
                 } else {
 
                     prepareToServe(pub, book.fileName!!, file.absolutePath, add = false, lcp = true)
-                    server.addEpub(publication, pub.container, "/" + book.fileName, applicationContext.filesDir.path + "/"+ Injectable.Style.rawValue +"/UserProperties.json")
+                    server.addEpub(publication, pub.container, "/" + book.fileName, applicationContext.filesDir.path + "/" + Injectable.Style.rawValue + "/UserProperties.json")
 
                     this@CatalogActivity.startActivity(intentFor<EpubActivity>("publicationPath" to publicationPath, "publicationFileName" to book.fileName, "publication" to publication, "bookId" to book.id, "drm" to true))
                 }
@@ -343,8 +352,8 @@ class CatalogActivity : LibraryActivity(), LCPLibraryActivityService, CoroutineS
                     result?.let {
                         val publication = result as DRMFulfilledPublication
 
-                        Timber.d(result.localURL)
-                        Timber.d(result.suggestedFilename)
+                        if (DEBUG) Timber.d(result.localURL)
+                        if (DEBUG) Timber.d(result.suggestedFilename)
                         val file = File(result.localURL)
                         launch {
                             val parser = EpubParser()
